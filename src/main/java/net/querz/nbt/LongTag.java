@@ -98,12 +98,12 @@ public non-sealed class LongTag extends NumberTag {
 	public static final TagReader<LongTag> READER = new TagReader<>() {
 
 		@Override
-		public LongTag read(DataInput in, int depth) throws IOException {
+		public LongTag read(DataInput in, boolean rawArrays, int depth) throws IOException {
 			return valueOf(in.readLong());
 		}
 
 		@Override
-		public TagTypeVisitor.ValueResult read(DataInput in, TagTypeVisitor visitor) throws IOException {
+		public TagTypeVisitor.ValueResult read(DataInput in, TagTypeVisitor visitor, boolean rawArrays) throws IOException {
 			return visitor.visit(in.readLong());
 		}
 

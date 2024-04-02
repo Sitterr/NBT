@@ -3,6 +3,9 @@ package net.querz.nbt;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -110,20 +113,50 @@ public non-sealed class ByteArrayTag extends CollectionTag<ByteTag> {
 		this.value = value;
 	}
 
+	public int[] getIntArrayValue() {
+		IntBuffer buffer = getAsIntBuffer();
+		int[] array = new int[buffer.remaining()];
+		buffer.get(array);
+		return array;
+	}
+
+	public long[] getLongArrayValue() {
+		LongBuffer buffer = getAsLongBuffer();
+		long[] array = new long[buffer.remaining()];
+		buffer.get(array);
+		return array;
+	}
+
+	public ByteBuffer getAsByteBuffer() {
+		return ByteBuffer.wrap(value);
+	}
+
+	public IntBuffer getAsIntBuffer() {
+		return ByteBuffer.wrap(value).asIntBuffer();
+	}
+
+	public LongBuffer getAsLongBuffer() {
+		return ByteBuffer.wrap(value).asLongBuffer();
+	}
+
+	public IntArrayTag getAsIntArrayTag() {
+		return new IntArrayTag(getIntArrayValue());
+	}
+
+	public LongArrayTag getAsLongArrayTag() {
+		return new LongArrayTag(getLongArrayValue());
+	}
+
 	public static final TagReader<ByteArrayTag> READER = new TagReader<>() {
 
 		@Override
-		public ByteArrayTag read(DataInput in, int depth) throws IOException {
-			byte[] data = new byte[in.readInt()];
-			in.readFully(data);
-			return new ByteArrayTag(data);
+		public ByteArrayTag read(DataInput in, boolean rawArrays, int depth) throws IOException {
+			return new ByteArrayTag(readByteArray(in, in.readInt()));
 		}
 
 		@Override
-		public TagTypeVisitor.ValueResult read(DataInput in, TagTypeVisitor visitor) throws IOException {
-			byte[] data = new byte[in.readInt()];
-			in.readFully(data);
-			return visitor.visit(data);
+		public TagTypeVisitor.ValueResult read(DataInput in, TagTypeVisitor visitor, boolean rawArrays) throws IOException {
+			return visitor.visit(readByteArray(in, in.readInt()));
 		}
 
 		@Override

@@ -58,12 +58,12 @@ public non-sealed class StringTag implements Tag {
 	public static final TagReader<StringTag> READER = new TagReader<>() {
 
 		@Override
-		public StringTag read(DataInput in, int depth) throws IOException {
+		public StringTag read(DataInput in, boolean rawArrays, int depth) throws IOException {
 			return StringTag.valueOf(in.readUTF());
 		}
 
 		@Override
-		public TagTypeVisitor.ValueResult read(DataInput in, TagTypeVisitor visitor) throws IOException {
+		public TagTypeVisitor.ValueResult read(DataInput in, TagTypeVisitor visitor, boolean rawArrays) throws IOException {
 			return visitor.visit(in.readUTF());
 		}
 

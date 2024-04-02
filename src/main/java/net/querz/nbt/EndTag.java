@@ -26,12 +26,12 @@ public non-sealed class EndTag implements Tag {
 	public static final TagReader<EndTag> READER = new TagReader<>() {
 
 		@Override
-		public EndTag read(DataInput in, int depth) throws IOException {
+		public EndTag read(DataInput in, boolean rawArrays, int depth) throws IOException {
 			return INSTANCE;
 		}
 
 		@Override
-		public TagTypeVisitor.ValueResult read(DataInput in, TagTypeVisitor visitor) throws IOException {
+		public TagTypeVisitor.ValueResult read(DataInput in, TagTypeVisitor visitor, boolean rawArrays) throws IOException {
 			return visitor.visitEnd();
 		}
 

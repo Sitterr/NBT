@@ -4,6 +4,7 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Objects;
 
 public non-sealed class IntArrayTag extends CollectionTag<IntTag> {
@@ -112,10 +113,13 @@ public non-sealed class IntArrayTag extends CollectionTag<IntTag> {
 		this.value = value;
 	}
 
-	public static final TagReader<IntArrayTag> READER = new TagReader<>() {
+	public static final TagReader<CollectionTag<? extends NumberTag>> READER = new TagReader<>() {
 
 		@Override
-		public IntArrayTag read(DataInput in, int depth) throws IOException {
+		public CollectionTag<? extends NumberTag> read(DataInput in, boolean rawArrays, int depth) throws IOException {
+			if (rawArrays) {
+				return new ByteArrayTag(readByteArray(in, in.readInt() * 4));
+			}
 			int[] data = new int[in.readInt()];
 			for (int i = 0; i < data.length; i++) {
 				data[i] = in.readInt();
@@ -124,7 +128,10 @@ public non-sealed class IntArrayTag extends CollectionTag<IntTag> {
 		}
 
 		@Override
-		public TagTypeVisitor.ValueResult read(DataInput in, TagTypeVisitor visitor) throws IOException {
+		public TagTypeVisitor.ValueResult read(DataInput in, TagTypeVisitor visitor, boolean rawArrays) throws IOException {
+			if (rawArrays) {
+				return visitor.visit(readByteArray(in, in.readInt() * 4));
+			}
 			int[] data = new int[in.readInt()];
 			for (int i = 0; i < data.length; i++) {
 				data[i] = in.readInt();

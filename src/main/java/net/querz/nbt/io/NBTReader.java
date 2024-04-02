@@ -14,6 +14,7 @@ public final class NBTReader {
 	private boolean compression;
 	private boolean detectCompression;
 	private boolean littleEndian;
+	private boolean rawArrays;
 	private List<TagSelector> selectors = null;
 
 	private TagTypeVisitor visitor = null;
@@ -35,6 +36,11 @@ public final class NBTReader {
 
 	public NBTReader bigEndian() {
 		littleEndian = false;
+		return this;
+	}
+
+	public NBTReader rawArrays(boolean rawArrays) {
+		this.rawArrays = rawArrays;
 		return this;
 	}
 
@@ -107,7 +113,7 @@ public final class NBTReader {
 			}
 			TagReader<?> reader = Tag.Type.valueOf(input.readByte()).reader;
 			String name = input.readUTF();
-			return new NamedTag(name, reader.read(input, 0));
+			return new NamedTag(name, reader.read(input, rawArrays, 0));
 		} else {
 			SelectionStreamTagVisitor visitor = new SelectionStreamTagVisitor(selectors.toArray(new TagSelector[0]));
 			return readWithVisitor(input, visitor);
@@ -129,7 +135,7 @@ public final class NBTReader {
 				}
 				case CONTINUE -> {
 					name = input.readUTF();
-					reader.read(input, visitor);
+					reader.read(input, visitor, rawArrays);
 				}
 			}
 		}

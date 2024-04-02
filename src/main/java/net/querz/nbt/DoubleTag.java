@@ -96,12 +96,12 @@ public non-sealed class DoubleTag extends NumberTag {
 	public static final TagReader<DoubleTag> READER = new TagReader<>() {
 
 		@Override
-		public DoubleTag read(DataInput in, int depth) throws IOException {
+		public DoubleTag read(DataInput in, boolean rawArrays, int depth) throws IOException {
 			return valueOf(in.readDouble());
 		}
 
 		@Override
-		public TagTypeVisitor.ValueResult read(DataInput in, TagTypeVisitor visitor) throws IOException {
+		public TagTypeVisitor.ValueResult read(DataInput in, TagTypeVisitor visitor, boolean rawArrays) throws IOException {
 			return visitor.visit(in.readDouble());
 		}
 

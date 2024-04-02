@@ -253,7 +253,7 @@ public final class NBTUtil {
 				}
 				case CONTINUE -> {
 					StringTag.skipUTF(in);
-					reader.read(in, visitor);
+					reader.read(in, visitor, false);
 				}
 			}
 		}

@@ -112,10 +112,13 @@ public non-sealed class LongArrayTag extends CollectionTag<LongTag> {
 		this.value = value;
 	}
 
-	public static final TagReader<LongArrayTag> READER = new TagReader<>() {
+	public static final TagReader<CollectionTag<? extends NumberTag>> READER = new TagReader<>() {
 
 		@Override
-		public LongArrayTag read(DataInput in, int depth) throws IOException {
+		public CollectionTag<? extends NumberTag> read(DataInput in, boolean rawArrays, int depth) throws IOException {
+			if (rawArrays) {
+				return new ByteArrayTag(readByteArray(in, in.readInt() * 8));
+			}
 			long[] data = new long[in.readInt()];
 			for (int i = 0; i < data.length; i++) {
 				data[i] = in.readLong();
@@ -124,7 +127,10 @@ public non-sealed class LongArrayTag extends CollectionTag<LongTag> {
 		}
 
 		@Override
-		public TagTypeVisitor.ValueResult read(DataInput in, TagTypeVisitor visitor) throws IOException {
+		public TagTypeVisitor.ValueResult read(DataInput in, TagTypeVisitor visitor, boolean rawArrays) throws IOException {
+			if (rawArrays) {
+				return visitor.visit(readByteArray(in, in.readInt() * 8));
+			}
 			long[] data = new long[in.readInt()];
 			for (int i = 0; i < data.length; i++) {
 				data[i] = in.readLong();

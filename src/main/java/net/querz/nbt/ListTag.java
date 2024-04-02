@@ -456,7 +456,7 @@ public non-sealed class ListTag extends CollectionTag<Tag> {
 	public static final TagReader<ListTag> READER = new TagReader<>() {
 
 		@Override
-		public ListTag read(DataInput in, int depth) throws IOException {
+		public ListTag read(DataInput in, boolean rawArrays, int depth) throws IOException {
 			byte type = in.readByte();
 			int length = in.readInt();
 			if (type == END.id && length > 0) {
@@ -465,14 +465,17 @@ public non-sealed class ListTag extends CollectionTag<Tag> {
 				TagReader<?> tagReader = valueOf(type).reader;
 				List<Tag> list = new ArrayList<>(length);
 				for (int i = 0; i < length; i++) {
-					list.add(tagReader.read(in, depth + 1));
+					list.add(tagReader.read(in, rawArrays, depth + 1));
+				}
+				if (rawArrays && (type == INT_ARRAY.id || type == LONG_ARRAY.id)) {
+					type = BYTE_ARRAY.id;
 				}
 				return new ListTag(list, type == 0 ? null : Type.valueOf(type));
 			}
 		}
 
 		@Override
-		public TagTypeVisitor.ValueResult read(DataInput in, TagTypeVisitor visitor) throws IOException {
+		public TagTypeVisitor.ValueResult read(DataInput in, TagTypeVisitor visitor, boolean rawArrays) throws IOException {
 			TagReader<?> reader = valueOf(in.readByte()).reader;
 			int length = in.readInt();
 			switch (visitor.visitList(reader, length)) {
@@ -497,7 +500,7 @@ public non-sealed class ListTag extends CollectionTag<Tag> {
 							}
 							case SKIP -> reader.skip(in);
 							case ENTER -> {
-								switch (reader.read(in, visitor)) {
+								switch (reader.read(in, visitor, rawArrays)) {
 									case RETURN -> {
 										return TagTypeVisitor.ValueResult.RETURN;
 									}

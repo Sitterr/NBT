@@ -98,12 +98,12 @@ public non-sealed class IntTag extends NumberTag {
 	public static final TagReader<IntTag> READER = new TagReader<>() {
 
 		@Override
-		public IntTag read(DataInput in, int depth) throws IOException {
+		public IntTag read(DataInput in, boolean rawArrays, int depth) throws IOException {
 			return valueOf(in.readInt());
 		}
 
 		@Override
-		public TagTypeVisitor.ValueResult read(DataInput in, TagTypeVisitor visitor) throws IOException {
+		public TagTypeVisitor.ValueResult read(DataInput in, TagTypeVisitor visitor, boolean rawArrays) throws IOException {
 			return visitor.visit(in.readInt());
 		}
 

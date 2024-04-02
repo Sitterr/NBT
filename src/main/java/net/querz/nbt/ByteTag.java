@@ -101,12 +101,12 @@ public non-sealed class ByteTag extends NumberTag {
 	public static final TagReader<ByteTag> READER = new TagReader<>() {
 
 		@Override
-		public ByteTag read(DataInput in, int depth) throws IOException {
+		public ByteTag read(DataInput in, boolean rawArrays, int depth) throws IOException {
 			return valueOf(in.readByte());
 		}
 
 		@Override
-		public TagTypeVisitor.ValueResult read(DataInput in, TagTypeVisitor visitor) throws IOException {
+		public TagTypeVisitor.ValueResult read(DataInput in, TagTypeVisitor visitor, boolean rawArrays) throws IOException {
 			return visitor.visit(in.readByte());
 		}
 

@@ -95,12 +95,12 @@ public non-sealed class FloatTag extends NumberTag {
 	public static final TagReader<FloatTag> READER = new TagReader<>() {
 
 		@Override
-		public FloatTag read(DataInput in, int depth) throws IOException {
+		public FloatTag read(DataInput in, boolean rawArrays, int depth) throws IOException {
 			return valueOf(in.readFloat());
 		}
 
 		@Override
-		public TagTypeVisitor.ValueResult read(DataInput in, TagTypeVisitor visitor) throws IOException {
+		public TagTypeVisitor.ValueResult read(DataInput in, TagTypeVisitor visitor, boolean rawArrays) throws IOException {
 			return visitor.visit(in.readFloat());
 		}
 

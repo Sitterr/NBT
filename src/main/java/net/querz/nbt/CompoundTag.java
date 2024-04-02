@@ -230,7 +230,7 @@ public non-sealed class CompoundTag implements Tag, Map<String, Tag>, Iterable<M
 	public ListTag getList(String key) {
 		ListTag tag = getListTag(key);
 		if (tag == null) {
-			throw new NoSuchElementException("No byte array tag with key '"+key+"'");
+			throw new NoSuchElementException("No list tag with key '"+key+"'");
 		}
 		return tag;
 	}
@@ -533,7 +533,7 @@ public non-sealed class CompoundTag implements Tag, Map<String, Tag>, Iterable<M
 	public static final TagReader<CompoundTag> READER = new TagReader<>() {
 
 		@Override
-		public CompoundTag read(DataInput in, int depth) throws IOException {
+		public CompoundTag read(DataInput in, boolean rawArrays, int depth) throws IOException {
 			if (depth > MAX_DEPTH) {
 				throw new RuntimeException("tried to read NBT tag with too high complexity, depth > " + MAX_DEPTH);
 			}
@@ -542,14 +542,14 @@ public non-sealed class CompoundTag implements Tag, Map<String, Tag>, Iterable<M
 			while ((type = in.readByte()) != END.id) {
 				String key = in.readUTF();
 				TagReader<?> tagReader = valueOf(type).reader;
-				Tag tag = tagReader.read(in, depth + 1);
+				Tag tag = tagReader.read(in, rawArrays, depth + 1);
 				map.put(key, tag);
 			}
 			return new CompoundTag(map);
 		}
 
 		@Override
-		public TagTypeVisitor.ValueResult read(DataInput in, TagTypeVisitor visitor) throws IOException {
+		public TagTypeVisitor.ValueResult read(DataInput in, TagTypeVisitor visitor, boolean rawArrays) throws IOException {
 			for (;;) {
 				byte id;
 				if ((id = in.readByte()) != END.id) {
@@ -579,7 +579,7 @@ public non-sealed class CompoundTag implements Tag, Map<String, Tag>, Iterable<M
 									continue;
 								}
 								case ENTER -> {
-									if (reader.read(in, visitor) == TagTypeVisitor.ValueResult.RETURN) {
+									if (reader.read(in, visitor, rawArrays) == TagTypeVisitor.ValueResult.RETURN) {
 										return TagTypeVisitor.ValueResult.RETURN;
 									} else {
 										continue;
